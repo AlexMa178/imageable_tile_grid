@@ -3,5 +3,5 @@
 version = 4
 
 [[package]]
-name = "tile_grid"
+name = "imageable_tile_grid"
 version = "0.1.0"
