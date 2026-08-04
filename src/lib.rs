@@ -1,4 +1,6 @@
+#[cfg(test)]
 mod tictactoe_test;
+#[cfg(test)]
 mod digit_test;
 
 pub trait Tile {

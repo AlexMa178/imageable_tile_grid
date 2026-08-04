@@ -1,5 +1,3 @@
-#![cfg(test)]
-
 use crate::{ CharTile, Tile, TileGrid };
 
 #[derive(Clone, Copy)]
