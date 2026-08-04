@@ -2,6 +2,8 @@
 name = "imageable_tile_grid"
 version = "0.1.0"
 edition = "2024"
+description = "for personal use"
 repository = "https://github.com/AlexMa178/imageable_tile_grid"
+license = "CC0-1.0"
 
 [dependencies]
