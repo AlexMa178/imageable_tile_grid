@@ -53,7 +53,7 @@ fn test_tall_digit() {
 
     let mut grid: TileGrid<DigitTile, 7, 4> = TileGrid::fill(DigitTile::Empty);
     grid.view(1, 1).write_multi::<TallDigit>("16384");
-    let composed_image = grid.compose_image(&DIGIT_ATLAS, 11);
-    assert_eq!(composed_image, DIGIT_COMPOSED.to_vec());
+    let composed = grid.compose_image(&DIGIT_ATLAS, 11);
+    assert_eq!(composed, DIGIT_COMPOSED.to_vec());
 
 }

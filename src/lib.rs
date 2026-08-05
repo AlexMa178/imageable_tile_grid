@@ -42,7 +42,7 @@ impl<T: Tile, const W: usize, const H: usize> TileGrid<T, W, H> {
 
         let atlas_w_bytes = atlas_w_tiles * tile_w_bytes;
 
-        let mut res = vec![0; res_w_bytes * res_h_bytes ];
+        let mut res = vec![0; res_w_bytes * res_h_bytes];
 
         for grid_x_tiles in 0..W {
             let grid_x_bytes = grid_x_tiles * tile_w_bytes;

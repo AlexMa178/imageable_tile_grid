@@ -25,7 +25,9 @@ impl CharTile for TicTacToeTile {
     }
 }
 
-const TIC_TAC_TOE_ATLAS: [u8; 3*3*4 * 3] = [
+const ATLAS_W: usize = 3;
+const ATLAS_H: usize = 1;
+const TIC_TAC_TOE_ATLAS: [u8; 3*3*4 * ATLAS_W * ATLAS_H] = [
     0,0,0,255,          255,255,255,255,    0,0,0,255,          255,255,255,255,    0,0,0,255,          255,255,255,255,    255,255,255,255,    255,255,255,255,    255,255,255,255,
     255,255,255,255,    0,0,0,255,          255,255,255,255,    0,0,0,255,          255,255,255,255,    0,0,0,255,          255,255,255,255,    255,255,255,255,    255,255,255,255,
     0,0,0,255,          255,255,255,255,    0,0,0,255,          255,255,255,255,    0,0,0,255,          255,255,255,255,    255,255,255,255,    255,255,255,255,    255,255,255,255,
@@ -54,8 +56,8 @@ fn compose() {
     grid.grid[2][0] = TicTacToeTile::X;
     grid.grid[2][1] = TicTacToeTile::O;
     grid.grid[2][2] = TicTacToeTile::O;
-    let composed_image = grid.compose_image(&TIC_TAC_TOE_ATLAS, 3);
-    assert_eq!(composed_image, TIC_TAC_TOE_COMPOSED.to_vec());
+    let composed = grid.compose_image(&TIC_TAC_TOE_ATLAS, ATLAS_W);
+    assert_eq!(composed, TIC_TAC_TOE_COMPOSED.to_vec());
 
 }
 
@@ -64,7 +66,7 @@ fn view_and_compose() {
 
     let mut grid: TileGrid<TicTacToeTile, 3, 3> = TileGrid::fill(TicTacToeTile::Empty);
     grid.view(0, 0).write("X O\r\nXX \r\nXOO");
-    let composed_image = grid.compose_image(&TIC_TAC_TOE_ATLAS, 3);
-    assert_eq!(composed_image, TIC_TAC_TOE_COMPOSED.to_vec());
+    let composed = grid.compose_image(&TIC_TAC_TOE_ATLAS, ATLAS_W);
+    assert_eq!(composed, TIC_TAC_TOE_COMPOSED.to_vec());
 
 }
