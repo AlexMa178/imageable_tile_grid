@@ -18,14 +18,14 @@ pub struct TileGrid<T, const W: usize, const H: usize> {
 }
 impl<T, const W: usize, const H: usize> TileGrid<T, W, H> {
 
-    pub fn view<'a>(&'a mut self, x: usize, y: usize) -> TileGridView<'a, T, W, H> {
+    pub const fn view(&mut self, x: usize, y: usize) -> TileGridView<'_, T, W, H> {
         TileGridView { tg: self, x, y }
     }
 
 }
 impl<T: Clone + Copy, const W: usize, const H: usize> TileGrid<T, W, H> {
 
-    pub fn fill(fill: T) -> Self {
+    pub const fn fill(fill: T) -> Self {
         Self { grid: [[fill; W]; H] }
     }
 
@@ -79,22 +79,22 @@ pub struct TileGridView<'a, T, const W: usize, const H: usize> {
     x: usize,
     y: usize,
 }
-impl<'a, T, const W: usize, const H: usize> TileGridView<'a, T, W, H> {
+impl<T, const W: usize, const H: usize> TileGridView<'_, T, W, H> {
 
-    pub fn set_x(self, x: usize) -> Self {
+    pub const fn set_x(self, x: usize) -> Self {
         Self { tg: self.tg, x, y: self.y }
     }
 
-    pub fn set_y(self, y: usize) -> Self {
+    pub const fn set_y(self, y: usize) -> Self {
         Self { tg: self.tg, x: self.x, y }
     }
 
-    pub fn move_x(self, dx: i32) -> Self {
+    pub const fn move_x(self, dx: i32) -> Self {
         let new_x = (self.x as i32 + dx) as usize;
         self.set_x(new_x)
     }
 
-    pub fn move_y(self, dy: i32) -> Self {
+    pub const fn move_y(self, dy: i32) -> Self {
         let new_y = (self.y as i32 + dy) as usize;
         self.set_y(new_y)
     }
@@ -124,7 +124,7 @@ impl<'a, T, const W: usize, const H: usize> TileGridView<'a, T, W, H> {
     }
 
 }
-impl<'a, T: CharTile, const W: usize, const H: usize> TileGridView<'a, T, W, H> {
+impl<T: CharTile, const W: usize, const H: usize> TileGridView<'_, T, W, H> {
 
     pub fn write(self, s: &str) -> Self {
         let initial_x = self.x;
