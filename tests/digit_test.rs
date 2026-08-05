@@ -2,27 +2,27 @@ use imageable_tile_grid::{ CharTile, MultiTile, Tile, TileGrid };
 
 #[derive(Clone, Copy)]
 enum DigitTile {
-    Top(u8), Bottom(u8), Empty
+    DigitTop(u8), DigitBottom(u8), Empty
 }
 impl Tile for DigitTile {
     const SIZE: usize = 4;
     fn atlas_pos(&self) -> [usize; 2] {
         match self {
-            Self::Top(n) => [ *n as usize, 0 ],
-            Self::Bottom(n) => [ *n as usize, 1 ],
+            Self::DigitTop(n) => [ *n as usize, 0 ],
+            Self::DigitBottom(n) => [ *n as usize, 1 ],
             Self::Empty => [ 10, 0 ],
         }
     }
 }
 
 enum TallDigit {
-    N(u8), Empty
+    Digit(u8), Space
 }
 impl CharTile for TallDigit {
     fn from_char(c: char) -> Self {
         match c {
-            ' ' => Self::Empty,
-            nc if nc.is_ascii_digit() => Self::N(nc as u8 - b'0'),
+            ' ' => Self::Space,
+            nc if nc.is_ascii_digit() => Self::Digit(nc as u8 - b'0'),
             _ => panic!("invalid char"),
         }
     }
@@ -33,14 +33,11 @@ impl MultiTile for TallDigit {
         [ 1, 2 ]
     }
     fn sub(&self, x: usize, y: usize) -> Self::SubTile {
-        assert_eq!(x, 0);
-        match self {
-            Self::N(n) => match y {
-                0 => DigitTile::Top(*n),
-                1 => DigitTile::Bottom(*n),
-                _ => panic!("invalid index"),
-            },
-            Self::Empty => DigitTile::Empty,
+        match (self, x, y) {
+            (Self::Digit(n), 0, 0) => DigitTile::DigitTop(*n),
+            (Self::Digit(n), 0, 1) => DigitTile::DigitBottom(*n),
+            (Self::Space, 0, 0 | 1) => DigitTile::Empty,
+            _ => panic!("invalid sub"),
         }
     }
 }
