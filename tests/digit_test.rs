@@ -1,4 +1,4 @@
-use crate::{ CharTile, MultiTile, Tile, TileGrid };
+use imageable_tile_grid::{ CharTile, MultiTile, Tile, TileGrid };
 
 #[derive(Clone, Copy)]
 enum DigitTile {

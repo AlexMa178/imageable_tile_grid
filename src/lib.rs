@@ -1,8 +1,3 @@
-#[cfg(test)]
-mod tictactoe_test;
-#[cfg(test)]
-mod digit_test;
-
 pub trait Tile {
     const SIZE: usize;
     fn atlas_pos(&self) -> [usize; 2];

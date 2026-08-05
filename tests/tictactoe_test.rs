@@ -1,4 +1,4 @@
-use crate::{ CharTile, Tile, TileGrid };
+use imageable_tile_grid::{ CharTile, Tile, TileGrid };
 
 #[derive(Clone, Copy)]
 enum TicTacToeTile {
