@@ -48,8 +48,8 @@ const DIGIT_COMPOSED: [u8; 4*4*4 * 7 * 4] = [0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0
 #[test]
 fn test_tall_digit() {
 
-    let mut grid: TileGrid<DigitTile, 7, 4> = TileGrid::fill(DigitTile::Empty);
-    grid.view(1, 1).write_multi::<TallDigit>("16384");
+    let grid = TileGrid::<DigitTile, 7, 4>::fill(DigitTile::Empty)
+        .builder(1, 1).write_multi::<TallDigit>("16384").build();
     let composed = grid.compose_image(&DIGIT_ATLAS, 11);
     assert_eq!(composed, DIGIT_COMPOSED.to_vec());
 

@@ -64,8 +64,8 @@ fn compose() {
 #[test]
 fn view_and_compose() {
 
-    let mut grid: TileGrid<TicTacToeTile, 3, 3> = TileGrid::fill(TicTacToeTile::Empty);
-    grid.view(0, 0).write("X O\r\nXX \r\nXOO");
+    let grid = TileGrid::<TicTacToeTile, 3, 3>::fill(TicTacToeTile::Empty)
+        .builder(0, 0).write("X O\r\nXX \r\nXOO").build();
     let composed = grid.compose_image(&TIC_TAC_TOE_ATLAS, ATLAS_W);
     assert_eq!(composed, TIC_TAC_TOE_COMPOSED.to_vec());
 

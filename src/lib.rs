@@ -18,8 +18,8 @@ pub struct TileGrid<T, const W: usize, const H: usize> {
 }
 impl<T, const W: usize, const H: usize> TileGrid<T, W, H> {
 
-    pub const fn view(&mut self, x: usize, y: usize) -> TileGridView<'_, T, W, H> {
-        TileGridView { tg: self, x, y }
+    pub const fn builder(self, x: usize, y: usize) -> TileGridBuilder<T, W, H> {
+        TileGridBuilder { tg: self, x, y }
     }
 
 }
@@ -74,37 +74,41 @@ impl<T: Tile, const W: usize, const H: usize> TileGrid<T, W, H> {
 
 }
 
-pub struct TileGridView<'a, T, const W: usize, const H: usize> {
-    tg: &'a mut TileGrid<T, W, H>,
+pub struct TileGridBuilder<T, const W: usize, const H: usize> {
+    tg: TileGrid<T, W, H>,
     x: usize,
     y: usize,
 }
-impl<T, const W: usize, const H: usize> TileGridView<'_, T, W, H> {
+impl<T, const W: usize, const H: usize> TileGridBuilder<T, W, H> {
 
-    pub const fn set_x(self, x: usize) -> Self {
+    pub fn build(self) -> TileGrid<T, W, H> {
+        self.tg
+    }
+
+    pub fn set_x(self, x: usize) -> Self {
         Self { tg: self.tg, x, y: self.y }
     }
 
-    pub const fn set_y(self, y: usize) -> Self {
+    pub fn set_y(self, y: usize) -> Self {
         Self { tg: self.tg, x: self.x, y }
     }
 
-    pub const fn move_x(self, dx: i32) -> Self {
+    pub fn move_x(self, dx: i32) -> Self {
         let new_x = (self.x as i32 + dx) as usize;
         self.set_x(new_x)
     }
 
-    pub const fn move_y(self, dy: i32) -> Self {
+    pub fn move_y(self, dy: i32) -> Self {
         let new_y = (self.y as i32 + dy) as usize;
         self.set_y(new_y)
     }
 
-    pub fn put(self, v: T) -> Self {
+    pub fn put(mut self, v: T) -> Self {
         self.tg.grid[self.y][self.x] = v;
         self.move_x(1)
     }
 
-    pub fn put_multi<M: MultiTile<SubTile = T>>(self, v: M) -> Self {
+    pub fn put_multi<M: MultiTile<SubTile = T>>(mut self, v: M) -> Self {
         let [ tw, th ] = v.dimensions();
         for dx in 0..tw {
             for dy in 0..th {
@@ -124,7 +128,7 @@ impl<T, const W: usize, const H: usize> TileGridView<'_, T, W, H> {
     }
 
 }
-impl<T: CharTile, const W: usize, const H: usize> TileGridView<'_, T, W, H> {
+impl<T: CharTile, const W: usize, const H: usize> TileGridBuilder<T, W, H> {
 
     pub fn write(self, s: &str) -> Self {
         let initial_x = self.x;
