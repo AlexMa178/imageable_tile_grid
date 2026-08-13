@@ -1,3 +1,5 @@
+mod compose_ggez;
+
 pub trait Tile {
     const SIZE: usize;
     fn atlas_pos(&self) -> [usize; 2];
