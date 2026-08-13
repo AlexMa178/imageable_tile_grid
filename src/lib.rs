@@ -1,4 +1,4 @@
-mod compose_ggez;
+pub mod compose_ggez;
 
 pub trait Tile {
     const SIZE: usize;
