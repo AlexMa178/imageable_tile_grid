@@ -23,7 +23,7 @@ impl<T: Tile, const W: usize, const H: usize> TileGrid<T, W, H> {
                 canvas.draw(&atlas, DrawParam::default()
                     .src(Rect {
                         x: (T::SIZE * atlas_x) as f32 / atlas.width() as f32,
-                        y: (T::SIZE * atlas_y) as f32 / atlas.width() as f32,
+                        y: (T::SIZE * atlas_y) as f32 / atlas.height() as f32,
                         w: T::SIZE as f32 / atlas.width() as f32,
                         h: T::SIZE as f32 / atlas.height() as f32,
                     }).dest(Point2 {
