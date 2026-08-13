@@ -1,25 +1,22 @@
 #![cfg(feature = "ggez")]
 
-use ggez::context::Context;
-use ggez::graphics::{ Canvas, Color, DrawParam, Image, Rect, Sampler };
+use ggez::graphics::{ GraphicsContext, Canvas, Color, DrawParam, Image, Rect, Sampler };
+use ggez::error::GameResult;
 use ggez::mint::Point2;
 
 use crate::{ Tile, TileGrid };
 
-pub trait ComposeGgez {
-    fn compose_image_ggez(&self, ctx: &Context, atlas: &Image) -> Image;
-}
-impl<T: Tile, const W: usize, const H: usize> ComposeGgez for TileGrid<T, W, H> {
+impl<T: Tile, const W: usize, const H: usize> TileGrid<T, W, H> {
 
-    fn compose_image_ggez(&self, ctx: &Context, atlas: &Image) -> Image {
+    fn compose_image_ggez(&self, gfx: &mut GraphicsContext, atlas: Image) -> GameResult<Image> {
 
-        let canvas_image = Image::new_canvas_image(ctx, (W * T::SIZE) as u32, (H * T::SIZE) as u32, 1);
-        let mut canvas = Canvas::from_image(ctx, canvas_image.clone(), Some(Color::from_rgba(0, 0, 0, 0)));
+        let canvas_image = Image::new_canvas_image(gfx, (W * T::SIZE) as u32, (H * T::SIZE) as u32, 1);
+        let mut canvas = Canvas::from_image(gfx, canvas_image.clone(), Some(Color::from_rgba(0, 0, 0, 0)));
         canvas.set_sampler(Sampler::nearest_clamp());
         for grid_x in 0..W {
             for grid_y in 0..H {
                 let [ atlas_x, atlas_y ] = self.grid[grid_y][grid_x].atlas_pos();
-                canvas.draw(atlas, DrawParam::default()
+                canvas.draw(&atlas, DrawParam::default()
                     .src(Rect {
                         x: (T::SIZE * atlas_x) as f32 / atlas.width() as f32,
                         y: (T::SIZE * atlas_y) as f32 / atlas.width() as f32,
@@ -31,7 +28,8 @@ impl<T: Tile, const W: usize, const H: usize> ComposeGgez for TileGrid<T, W, H> 
                     }));
             }
         }
-        canvas_image
+        canvas.finish(gfx)?;
+        Ok(canvas_image)
 
     }
 
