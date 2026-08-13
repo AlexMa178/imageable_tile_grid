@@ -6,7 +6,7 @@ use ggez::mint::Point2;
 
 use crate::{ Tile, TileGrid };
 
-trait ComposeGgez {
+pub trait ComposeGgez {
     fn compose_image_ggez(&self, ctx: &Context, atlas: &Image) -> Image;
 }
 impl<T: Tile, const W: usize, const H: usize> ComposeGgez for TileGrid<T, W, H> {
