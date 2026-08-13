@@ -1,6 +1,6 @@
 [package]
 name = "imageable_tile_grid"
-version = "0.1.6"
+version = "0.1.7"
 edition = "2024"
 description = "for personal use"
 repository = "https://github.com/AlexMa178/imageable_tile_grid"

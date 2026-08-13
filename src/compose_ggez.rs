@@ -10,7 +10,7 @@ use crate::{ Tile, TileGrid };
 
 impl<T: Tile, const W: usize, const H: usize> TileGrid<T, W, H> {
 
-    fn compose_image_ggez(&self, gfx: &mut impl HasMut<GraphicsContext>, atlas: Image) -> GameResult<Image> {
+    pub fn compose_image_ggez(&self, gfx: &mut impl HasMut<GraphicsContext>, atlas: Image) -> GameResult<Image> {
 
         let gfx = gfx.retrieve_mut();
 
