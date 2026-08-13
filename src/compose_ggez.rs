@@ -1,14 +1,18 @@
 #![cfg(feature = "ggez")]
 
-use ggez::graphics::{ GraphicsContext, Canvas, Color, DrawParam, Image, Rect, Sampler };
+use ggez::context::HasMut;
 use ggez::error::GameResult;
+use ggez::graphics::{ GraphicsContext, Canvas, Color, DrawParam, Image, Rect, Sampler };
+
 use ggez::mint::Point2;
 
 use crate::{ Tile, TileGrid };
 
 impl<T: Tile, const W: usize, const H: usize> TileGrid<T, W, H> {
 
-    fn compose_image_ggez(&self, gfx: &mut GraphicsContext, atlas: Image) -> GameResult<Image> {
+    fn compose_image_ggez(&self, gfx: &mut impl HasMut<GraphicsContext>, atlas: Image) -> GameResult<Image> {
+
+        let gfx = gfx.retrieve_mut();
 
         let canvas_image = Image::new_canvas_image(gfx, (W * T::SIZE) as u32, (H * T::SIZE) as u32, 1);
         let mut canvas = Canvas::from_image(gfx, canvas_image.clone(), Some(Color::from_rgba(0, 0, 0, 0)));
