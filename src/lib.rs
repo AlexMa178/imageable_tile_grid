@@ -57,8 +57,8 @@ impl<T: Tile, const W: usize, const H: usize> TileGrid<T, W, H> {
         let w = NumCast::from(W).unwrap();
         let h = NumCast::from(H).unwrap();
         let mut canvas = PixelCanvas::new::<T::TileUnit>(gfx, [ w, h ]);
-        let xs = { let mut x = ConstZero::ZERO; iter::from_fn(move || { x += ConstOne::ONE; if x < w { Some(x) } else { None } }) };
-        let ys = { let mut y = ConstZero::ZERO; iter::from_fn(move || { y += ConstOne::ONE; if y < h { Some(y) } else { None } }) };
+        let xs = { let mut x = ConstZero::ZERO; iter::from_fn(move || { if x < w { let res = Some(x); x += ConstOne::ONE; res } else { None } }) };
+        let ys = { let mut y = ConstZero::ZERO; iter::from_fn(move || { if y < h { let res = Some(y); y += ConstOne::ONE; res } else { None } }) };
         for x in xs {
             for y in ys.clone() {
                 let [ atlas_x, atlas_y ] = self.at(x, y).atlas_pos();
@@ -110,8 +110,8 @@ impl<T: Tile, const W: usize, const H: usize> TileGridBuilder<T, W, H> {
 
     pub fn put_multi<M: MultiTile<SubTile = T>>(mut self, v: M) -> Self {
         let [ w, h ] = v.dimensions();
-        let xs = { let mut dx = ConstZero::ZERO; iter::from_fn(move || { dx += ConstOne::ONE; if dx < w { Some(dx) } else { None } }) };
-        let ys = { let mut dy = ConstZero::ZERO; iter::from_fn(move || { dy += ConstOne::ONE; if dy < h { Some(dy) } else { None } }) };
+        let xs = { let mut dx = ConstZero::ZERO; iter::from_fn(move || { if dx < w { let res = Some(dx); dx += ConstOne::ONE; res } else { None } }) };
+        let ys = { let mut dy = ConstZero::ZERO; iter::from_fn(move || { if dy < h { let res = Some(dy); dy += ConstOne::ONE; res } else { None } }) };
         for dx in xs {
             for dy in ys.clone() {
                 *self.tg.at_mut(self.x + dx, self.y + dy) = v.sub(dx, dy);
