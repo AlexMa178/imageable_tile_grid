@@ -61,7 +61,11 @@ impl<T: Tile, const W: usize, const H: usize> TileGrid<T, W, H> {
         let ys = { let mut dy = ConstZero::ZERO; iter::from_fn(move || { dy += ConstOne::ONE; if dy < h { Some(dy) } else { None } }) };
         for dx in xs {
             for dy in ys.clone() {
-                canvas.draw(atlas, PixelDrawParams::<T::PixelUnit>::default().dest::<T::TileUnit>([ dx, dy ]));
+                let [ atl_x, atl_y ] = self.at(dx, dy).atlas_pos();
+                canvas.draw(atlas, PixelDrawParams::<T::PixelUnit>::default()
+                    .dest::<T::TileUnit>([ dx, dy ])
+                    .atlas_rect::<T::TileUnit>(([ atl_x, atl_y ], [ ConstOne::ONE, ConstOne::ONE ]))
+                );
             }
         }
         canvas.finish(gfx)
