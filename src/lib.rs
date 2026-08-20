@@ -100,7 +100,7 @@ impl<T: Tile, const W: usize, const H: usize> TileGridBuilder<T, W, H> {
 
     pub fn move_y(self, dy: <T::TileUnit as Unit>::Scalar) -> Self {
         let y = self.y;
-        self.set_x(y + dy)
+        self.set_y(y + dy)
     }
 
     pub fn put(mut self, v: T) -> Self {
