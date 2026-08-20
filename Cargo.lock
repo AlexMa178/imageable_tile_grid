@@ -806,9 +806,9 @@ dependencies = [
 
 [[package]]
 name = "ggez_pixel_canvas"
-version = "0.1.15"
+version = "0.1.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9facf1799b034d5c020b35d4801ac72e9b531fbe99cb299454af833b256f9661"
+checksum = "dc6b3f91d23649958a265eff84df178289ab940d7547db31a7bdd2ea5844d236"
 dependencies = [
  "generic_discrete_2d_rotations",
  "ggez",
@@ -1066,7 +1066,7 @@ dependencies = [
 
 [[package]]
 name = "imageable_tile_grid"
-version = "0.1.9"
+version = "0.1.10"
 dependencies = [
  "ggez",
  "ggez_pixel_canvas",

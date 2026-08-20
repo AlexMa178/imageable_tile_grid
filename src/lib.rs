@@ -56,7 +56,7 @@ impl<T: Tile, const W: usize, const H: usize> TileGrid<T, W, H> {
         let gfx = gfx.retrieve_mut();
         let w = NumCast::from(W).unwrap();
         let h = NumCast::from(H).unwrap();
-        let mut canvas = PixelCanvas::new::<T::PixelUnit, T::TileUnit>(gfx, [ w, h ]);
+        let mut canvas = PixelCanvas::new::<T::TileUnit>(gfx, [ w, h ]);
         let xs = { let mut dx = ConstZero::ZERO; iter::from_fn(move || { dx += ConstOne::ONE; if dx < w { Some(dx) } else { None } }) };
         let ys = { let mut dy = ConstZero::ZERO; iter::from_fn(move || { dy += ConstOne::ONE; if dy < h { Some(dy) } else { None } }) };
         for dx in xs {
