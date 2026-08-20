@@ -11,8 +11,7 @@ use num_traits::{ AsPrimitive, ConstOne, ConstZero, NumCast };
 use ggez_pixel_canvas::{ AsPixel, PixelCanvas, PixelDrawParams };
 
 pub trait Tile: Copy {
-    type PixelUnit: Unit<Scalar: AsPrimitive<u32> + AsPrimitive<f32>>;
-    type TileUnit: Unit<Scalar: AsPrimitive<usize>> + AsPixel<PixelType = Self::PixelUnit>;
+    type TileUnit: Unit<Scalar: AsPrimitive<usize>> + AsPixel<PixelType: Unit<Scalar: AsPrimitive<u32> + AsPrimitive<f32>>>;
     fn atlas_pos(&self) -> [ <Self::TileUnit as Unit>::Scalar; 2 ];
 }
 
@@ -62,7 +61,7 @@ impl<T: Tile, const W: usize, const H: usize> TileGrid<T, W, H> {
         for x in xs {
             for y in ys.clone() {
                 let [ atlas_x, atlas_y ] = self.at(x, y).atlas_pos();
-                canvas.draw(atlas, PixelDrawParams::<T::PixelUnit>::default()
+                canvas.draw(atlas, PixelDrawParams::<<T::TileUnit as AsPixel>::PixelType>::default()
                     .dest::<T::TileUnit>([ x, y ])
                     .atlas_rect::<T::TileUnit>(([ atlas_x, atlas_y ], [ ConstOne::ONE, ConstOne::ONE ]))
                 );

@@ -1066,7 +1066,7 @@ dependencies = [
 
 [[package]]
 name = "imageable_tile_grid"
-version = "0.1.14"
+version = "0.1.15"
 dependencies = [
  "ggez",
  "ggez_pixel_canvas",
