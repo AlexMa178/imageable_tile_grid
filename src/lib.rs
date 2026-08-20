@@ -56,10 +56,8 @@ impl<T: Tile, const W: usize, const H: usize> TileGrid<T, W, H> {
         let w = NumCast::from(W).unwrap();
         let h = NumCast::from(H).unwrap();
         let mut canvas = PixelCanvas::new::<T::TileUnit>(gfx, [ w, h ]);
-        let xs = { let mut x = ConstZero::ZERO; iter::from_fn(move || { if x < w { let res = Some(x); x += ConstOne::ONE; res } else { None } }) };
-        let ys = { let mut y = ConstZero::ZERO; iter::from_fn(move || { if y < h { let res = Some(y); y += ConstOne::ONE; res } else { None } }) };
-        for x in xs {
-            for y in ys.clone() {
+        for x in range_from_zero::<T::TileUnit>(w) {
+            for y in range_from_zero::<T::TileUnit>(h) {
                 let [ atlas_x, atlas_y ] = self.at(x, y).atlas_pos();
                 canvas.draw(atlas, PixelDrawParams::<<T::TileUnit as AsPixel>::PixelType>::default()
                     .dest::<T::TileUnit>([ x, y ])
@@ -109,10 +107,8 @@ impl<T: Tile, const W: usize, const H: usize> TileGridBuilder<T, W, H> {
 
     pub fn put_multi<M: MultiTile<SubTile = T>>(mut self, v: M) -> Self {
         let [ w, h ] = v.dimensions();
-        let xs = { let mut dx = ConstZero::ZERO; iter::from_fn(move || { if dx < w { let res = Some(dx); dx += ConstOne::ONE; res } else { None } }) };
-        let ys = { let mut dy = ConstZero::ZERO; iter::from_fn(move || { if dy < h { let res = Some(dy); dy += ConstOne::ONE; res } else { None } }) };
-        for dx in xs {
-            for dy in ys.clone() {
+        for dx in range_from_zero::<T::TileUnit>(w) {
+            for dy in range_from_zero::<T::TileUnit>(h) {
                 *self.tg.at_mut(self.x + dx, self.y + dy) = v.sub(dx, dy);
             }
         }
@@ -140,4 +136,11 @@ impl<T: CharTile + Tile, const W: usize, const H: usize> TileGridBuilder<T, W, H
         })
     }
 
+}
+
+fn range_from_zero<T: Unit>(max_exclusive: T::Scalar) -> Vec<T::Scalar> {
+    let mut curr = ConstZero::ZERO;
+    iter::from_fn(move || {
+        if curr < max_exclusive { let res = Some(curr); curr += ConstOne::ONE; res } else { None }
+    }).collect()
 }
