@@ -12,7 +12,7 @@ use ggez_pixel_canvas::{ AsPixel, PixelCanvas, PixelDrawParams };
 
 pub trait Tile: Copy {
     type PixelUnit: Unit<Scalar: AsPrimitive<u32> + AsPrimitive<f32>>;
-    type TileUnit: Unit<Scalar: AsPrimitive<usize>> + AsPixel<Self::PixelUnit>;
+    type TileUnit: Unit<Scalar: AsPrimitive<usize>> + AsPixel<PixelType = Self::PixelUnit>;
     fn atlas_pos(&self) -> [ <Self::TileUnit as Unit>::Scalar; 2 ];
 }
 
