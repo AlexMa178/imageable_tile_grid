@@ -437,7 +437,7 @@ checksum = "28780d72908948745af036ca7418d6d932f60afb48ed623291d2ccbfb8aefbff"
 dependencies = [
  "bytemuck",
  "crevice-derive",
- "glam",
+ "glam 0.32.1",
  "mint",
 ]
 
@@ -724,6 +724,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "generic_discrete_2d_rotations"
+version = "0.1.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d68ebcd952575068159e69a691bd685eed88804970a9201ab10e60ad4b39b496"
+
+[[package]]
 name = "gethostname"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -780,7 +786,7 @@ dependencies = [
  "crevice",
  "directories",
  "gilrs",
- "glam",
+ "glam 0.32.1",
  "glyph_brush",
  "image",
  "log",
@@ -796,6 +802,18 @@ dependencies = [
  "wgpu",
  "winit",
  "zip",
+]
+
+[[package]]
+name = "ggez_pixel_canvas"
+version = "0.1.15"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9facf1799b034d5c020b35d4801ac72e9b531fbe99cb299454af833b256f9661"
+dependencies = [
+ "generic_discrete_2d_rotations",
+ "ggez",
+ "glamour",
+ "num-traits",
 ]
 
 [[package]]
@@ -845,12 +863,36 @@ dependencies = [
 
 [[package]]
 name = "glam"
+version = "0.30.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "19fc433e8437a212d1b6f1e68c7824af3aed907da60afa994e7f542d18d12aa9"
+dependencies = [
+ "approx",
+ "bytemuck",
+ "mint",
+]
+
+[[package]]
+name = "glam"
 version = "0.32.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f70749695b063ecbf6b62949ccccde2e733ec3ecbbd71d467dca4e5c6c97cca0"
 dependencies = [
  "bytemuck",
  "mint",
+]
+
+[[package]]
+name = "glamour"
+version = "0.18.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ef06d510f7874a5647445b66316936f7a4a14bc8c30035da257bab425a991eb0"
+dependencies = [
+ "approx",
+ "bytemuck",
+ "glam 0.30.10",
+ "mint",
+ "num-traits",
 ]
 
 [[package]]
@@ -1027,6 +1069,9 @@ name = "imageable_tile_grid"
 version = "0.1.8"
 dependencies = [
  "ggez",
+ "ggez_pixel_canvas",
+ "glamour",
+ "num-traits",
 ]
 
 [[package]]

@@ -1,8 +1,19 @@
-pub mod compose_ggez;
+use std::iter;
 
-pub trait Tile {
-    const SIZE: usize;
-    fn atlas_pos(&self) -> [usize; 2];
+use ggez::context::HasMut;
+use ggez::error::GameResult;
+use ggez::graphics::{ GraphicsContext, Image };
+
+use glamour::Unit;
+
+use num_traits::{ AsPrimitive, ConstOne, ConstZero, NumCast };
+
+use ggez_pixel_canvas::{ AsPixel, PixelCanvas, PixelDrawParams };
+
+pub trait Tile: Copy {
+    type PixelUnit: Unit<Scalar: AsPrimitive<u32> + AsPrimitive<f32>>;
+    type TileUnit: Unit<Scalar: AsPrimitive<usize>> + AsPixel<Self::PixelUnit>;
+    fn atlas_pos(&self) -> [ <Self::TileUnit as Unit>::Scalar; 2 ];
 }
 
 pub trait CharTile {
@@ -11,132 +22,117 @@ pub trait CharTile {
 
 pub trait MultiTile {
     type SubTile: Tile;
-    fn dimensions(&self) -> [ usize; 2 ];
-    fn sub(&self, x: usize, y: usize) -> Self::SubTile;
+    fn dimensions(&self) -> [ <<Self::SubTile as Tile>::TileUnit as Unit>::Scalar; 2 ];
+    fn sub(&self, x: <<Self::SubTile as Tile>::TileUnit as Unit>::Scalar, y: <<Self::SubTile as Tile>::TileUnit as Unit>::Scalar) -> Self::SubTile;
 }
 
-pub struct TileGrid<T, const W: usize, const H: usize> {
+pub struct TileGrid<T: Tile, const W: usize, const H: usize> {
     pub grid: [[T; W]; H]
 }
-impl<T, const W: usize, const H: usize> TileGrid<T, W, H> {
-
-    pub const fn builder(self, x: usize, y: usize) -> TileGridBuilder<T, W, H> {
-        TileGridBuilder { tg: self, x, y }
-    }
-
-}
-impl<T: Clone + Copy, const W: usize, const H: usize> TileGrid<T, W, H> {
+impl<T: Tile, const W: usize, const H: usize> TileGrid<T, W, H> {
 
     pub const fn fill(fill: T) -> Self {
         Self { grid: [[fill; W]; H] }
     }
 
-}
-impl<T: Tile, const W: usize, const H: usize> TileGrid<T, W, H> {
+    pub fn at(&self, x: <T::TileUnit as Unit>::Scalar, y: <T::TileUnit as Unit>::Scalar) -> T {
+        let r: usize = y.as_();
+        let c: usize = x.as_();
+        self.grid[r][c]
+    }
 
-    pub fn compose_image(&self, atlas: &[u8], atlas_w_tiles: usize) -> Vec<u8> {
+    pub fn at_mut(&mut self, x: <T::TileUnit as Unit>::Scalar, y: <T::TileUnit as Unit>::Scalar) -> &mut T {
+        let r: usize = y.as_();
+        let c: usize = x.as_();
+        &mut self.grid[r][c]
+    }
 
-        let tile_w_bytes = T::SIZE * 4;
-        let tile_h_bytes = T::SIZE;
+    pub const fn builder(self, x: <T::TileUnit as Unit>::Scalar, y: <T::TileUnit as Unit>::Scalar) -> TileGridBuilder<T, W, H> {
+        TileGridBuilder { tg: self, x, y }
+    }
 
-        let res_w_bytes = W * tile_w_bytes;
-        let res_h_bytes = H * tile_h_bytes;
+    pub fn compose_image(&self, gfx: &mut impl HasMut<GraphicsContext>, atlas: &Image) -> GameResult<Image> {
 
-        let atlas_w_bytes = atlas_w_tiles * tile_w_bytes;
-
-        let mut res = vec![0; res_w_bytes * res_h_bytes];
-
-        for grid_x_tiles in 0..W {
-            let grid_x_bytes = grid_x_tiles * tile_w_bytes;
-            for grid_y_tiles in 0..H {
-                let grid_y_bytes = grid_y_tiles * tile_h_bytes;
-
-                let [ atlas_x_tiles, atlas_y_tiles ] = self.grid[grid_y_tiles][grid_x_tiles].atlas_pos();
-                let atlas_x_bytes = atlas_x_tiles * tile_w_bytes;
-                let atlas_y_bytes = atlas_y_tiles * tile_h_bytes;
-
-                for offset_y in 0..tile_h_bytes {
-
-                    let res_start   = (grid_y_bytes  + offset_y) * res_w_bytes   + grid_x_bytes;
-                    let atlas_start = (atlas_y_bytes + offset_y) * atlas_w_bytes + atlas_x_bytes;
-                    
-                    let res_slice = &mut res[res_start  ..(res_start   + tile_w_bytes)];
-                    let atlas_slice = &atlas[atlas_start..(atlas_start + tile_w_bytes)];
-
-                    res_slice.copy_from_slice(atlas_slice);
-
-                }
-
+        let gfx = gfx.retrieve_mut();
+        let w = NumCast::from(W).unwrap();
+        let h = NumCast::from(H).unwrap();
+        let mut canvas = PixelCanvas::new::<T::PixelUnit, T::TileUnit>(gfx, [ w, h ]);
+        let xs = { let mut dx = ConstZero::ZERO; iter::from_fn(move || { dx += ConstOne::ONE; if dx < w { Some(dx) } else { None } }) };
+        let ys = { let mut dy = ConstZero::ZERO; iter::from_fn(move || { dy += ConstOne::ONE; if dy < h { Some(dy) } else { None } }) };
+        for dx in xs {
+            for dy in ys.clone() {
+                canvas.draw(atlas, PixelDrawParams::<T::PixelUnit>::default().dest::<T::TileUnit>([ dx, dy ]));
             }
         }
-
-        res
+        canvas.finish(gfx)
 
     }
 
 }
 
-pub struct TileGridBuilder<T, const W: usize, const H: usize> {
+pub struct TileGridBuilder<T: Tile, const W: usize, const H: usize> {
     tg: TileGrid<T, W, H>,
-    x: usize,
-    y: usize,
+    x: <T::TileUnit as Unit>::Scalar,
+    y: <T::TileUnit as Unit>::Scalar,
 }
-impl<T, const W: usize, const H: usize> TileGridBuilder<T, W, H> {
+impl<T: Tile, const W: usize, const H: usize> TileGridBuilder<T, W, H> {
 
     pub fn build(self) -> TileGrid<T, W, H> {
         self.tg
     }
 
-    pub fn set_x(self, x: usize) -> Self {
+    pub fn set_x(self, x: <T::TileUnit as Unit>::Scalar) -> Self {
         Self { tg: self.tg, x, y: self.y }
     }
 
-    pub fn set_y(self, y: usize) -> Self {
+    pub fn set_y(self, y: <T::TileUnit as Unit>::Scalar) -> Self {
         Self { tg: self.tg, x: self.x, y }
     }
 
-    pub fn move_x(self, dx: i32) -> Self {
-        let new_x = (self.x as i32 + dx) as usize;
-        self.set_x(new_x)
+    pub fn move_x(self, dx: <T::TileUnit as Unit>::Scalar) -> Self {
+        let x = self.x;
+        self.set_x(x + dx)
     }
 
-    pub fn move_y(self, dy: i32) -> Self {
-        let new_y = (self.y as i32 + dy) as usize;
-        self.set_y(new_y)
+    pub fn move_y(self, dy: <T::TileUnit as Unit>::Scalar) -> Self {
+        let y = self.y;
+        self.set_x(y + dy)
     }
 
     pub fn put(mut self, v: T) -> Self {
-        self.tg.grid[self.y][self.x] = v;
-        self.move_x(1)
+        *self.tg.at_mut(self.x, self.y) = v;
+        self.move_x(ConstOne::ONE)
     }
 
     pub fn put_multi<M: MultiTile<SubTile = T>>(mut self, v: M) -> Self {
-        let [ tw, th ] = v.dimensions();
-        for dx in 0..tw {
-            for dy in 0..th {
-                self.tg.grid[self.y + dy][self.x + dx] = v.sub(dx, dy);
+        let [ w, h ] = v.dimensions();
+        let xs = { let mut dx = ConstZero::ZERO; iter::from_fn(move || { dx += ConstOne::ONE; if dx < w { Some(dx) } else { None } }) };
+        let ys = { let mut dy = ConstZero::ZERO; iter::from_fn(move || { dy += ConstOne::ONE; if dy < h { Some(dy) } else { None } }) };
+        for dx in xs {
+            for dy in ys.clone() {
+                *self.tg.at_mut(dx, dy) = v.sub(dx, dy);
             }
         }
-        self.move_x(tw as i32)
+        self.move_x(w)
     }
 
     pub fn write_multi<M: MultiTile<SubTile = T> + CharTile>(self, s: &str) -> Self {
         let initial_x = self.x;
         s.chars().fold(self, |view, character| match character {
             '\r' => view.set_x(initial_x),
-            '\n' => view.move_y(1),
+            '\n' => view.move_y(ConstOne::ONE),
             c => view.put_multi(M::from_char(c)),
         })
     }
 
 }
-impl<T: CharTile, const W: usize, const H: usize> TileGridBuilder<T, W, H> {
+impl<T: CharTile + Tile, const W: usize, const H: usize> TileGridBuilder<T, W, H> {
 
     pub fn write(self, s: &str) -> Self {
         let initial_x = self.x;
         s.chars().fold(self, |view, character| match character {
             '\r' => view.set_x(initial_x),
-            '\n' => view.move_y(1),
+            '\n' => view.move_y(ConstOne::ONE),
             c => view.put(T::from_char(c)),
         })
     }
