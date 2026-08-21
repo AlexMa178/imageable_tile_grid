@@ -7,7 +7,7 @@ repository = "https://github.com/AlexMa178/imageable_tile_grid"
 license = "CC0-1.0"
 
 [dependencies]
-ggez_pixel_canvas = "0.1.17"
+ggez_pixel_canvas = "0.1.19"
 glamour = "0.18.0"
 num-traits = "0.2.19"
 ggez = "0.10.0"

@@ -58,10 +58,10 @@ impl<T: Tile, const W: usize, const H: usize> TileGrid<T, W, H> {
         let mut canvas = PixelCanvas::new::<T::TileUnit>(gfx, [ w, h ]);
         for x in range_from_zero::<T::TileUnit>(w) {
             for y in range_from_zero::<T::TileUnit>(h) {
-                let [ atlas_x, atlas_y ] = self.at(x, y).atlas_pos();
+                let atlas_pos = self.at(x, y).atlas_pos();
                 canvas.draw(atlas, PixelDrawParams::<<T::TileUnit as AsPixel>::PixelType>::default()
                     .dest::<T::TileUnit>([ x, y ])
-                    .atlas_rect::<T::TileUnit>(([ atlas_x, atlas_y ], [ ConstOne::ONE, ConstOne::ONE ]))
+                    .atlas_rect::<T::TileUnit>((atlas_pos, [ ConstOne::ONE, ConstOne::ONE ]))
                 );
             }
         }
